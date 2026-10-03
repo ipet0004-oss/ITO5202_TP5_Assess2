@@ -32,3 +32,6 @@ Execution Steps for initial setup of docker container in VS Code:
   --NotebookApp.token='' \
   --NotebookApp.password=''
   7. Enter pyspark container: docker exec -it pyspark bash
+  8. In terminal navigate to container folder: cd /home/jovyan/work
+  9. Run python code from this location
+  10. In terminal use exit to exit the container

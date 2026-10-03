@@ -9,8 +9,7 @@ def connect_kafka_producer():
     _producer = None
     try:
         _producer = KafkaProducer(bootstrap_servers=['kafka:9092'],
-                                  value_serializer=lambda x: dumps(x).encode('ascii'),
-                                  api_version=(0, 10))
+                                  value_serializer=lambda x: dumps(x).encode("utf-8"))
     except Exception as ex:
         print('Exception while connecting Kafka.')
         print(str(ex))
@@ -35,8 +34,7 @@ if __name__ == "__main__":
     print(f"Streaming subset contains "f"{stream_df.count()} records.")
     print("should contain 44791 records")
 
-    records = [row.asDict()for row in stream_df.limit(1600).collect()]
-    #records = [row.asDict()for row in stream_df.collect()]
+    records = [row.asDict()for row in stream_df.collect()]
 
     producer = connect_kafka_producer()
 
@@ -55,17 +53,25 @@ if __name__ == "__main__":
         for record in batch:
             record["event_timestamp"] = event_timestamp
 
+        
         #serialises each batch as a JSON array and publish it to kafta topic
-        producer.send(topic,value=batch)
-
-        # Ensure batch has been sent
-        producer.flush()
+        future = producer.send(topic,value=batch)
 
         #logs the record count and timestamp of each batch to stdout
-        print(f"Batch {batch_number}: " f"{len(batch)} records published at " f"{event_timestamp}")
+        try:
+            metadata = future.get(timeout=10)
+            print(
+                    f"Batch {batch_number}: "
+                    f"{len(batch)} records published at {event_timestamp} "
+                    f"(partition={metadata.partition}, offset={metadata.offset})"
+                )
+        except Exception as ex:
+            print(
+                f"Batch {batch_number} failed to publish: "
+                f"{type(ex).__name__}: {ex}"
+            )
 
         batch_number += 1
-
         #pauses for exactly 5 seconds between batches to simulate a controlled arrival rate
         sleep(5)
 
