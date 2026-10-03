@@ -2,8 +2,7 @@
 from pyspark.sql import SparkSession
 from time import sleep
 from json import dumps
-from kafka3 import KafkaProducer
-import random
+from kafka import KafkaProducer
 import datetime as dt
 
 def connect_kafka_producer():
@@ -36,7 +35,8 @@ if __name__ == "__main__":
     print(f"Streaming subset contains "f"{stream_df.count()} records.")
     print("should contain 44791 records")
 
-    records = [row.asDict()for row in stream_df.collect()]
+    records = [row.asDict()for row in stream_df.limit(1600).collect()]
+    #records = [row.asDict()for row in stream_df.collect()]
 
     producer = connect_kafka_producer()
 

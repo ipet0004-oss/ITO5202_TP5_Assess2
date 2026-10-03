@@ -1,20 +1,29 @@
-# Use an official data science runtime as a parent image
+# Use Jupyter scipy notebook as parent image
 FROM jupyter/scipy-notebook:latest
 
-# Set the working directory inside the container
+# Switch to root to install Java
+USER root
+
+# Install Java required by PySpark
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk-headless && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Return to normal Jupyter user
+USER ${NB_UID}
+
+# Set working directory
 WORKDIR /usr/src/app
 
-# Copy your local notebook and files into the container
+# Copy project files into container
 COPY . .
 
 # Install Python dependencies
-RUN pip install kafka-python
+RUN pip install --no-cache-dir pyspark kafka-python
 
-# Expose the default Jupyter port
+# Expose Jupyter port
 EXPOSE 8888
 
-# Override entrypoint to prevent recursive start.sh
+# Override entrypoint
 ENTRYPOINT [""]
-
-# Start the Jupyter notebook server inside the container
-CMD ["start-notebook.sh", "--NotebookApp.token=''"]
