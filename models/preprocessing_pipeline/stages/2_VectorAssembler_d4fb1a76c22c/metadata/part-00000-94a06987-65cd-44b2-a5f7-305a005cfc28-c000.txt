@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1791065061429,"sparkVersion":"4.2.0","uid":"VectorAssembler_d4fb1a76c22c","paramMap":{"handleInvalid":"keep","inputCols":["Hour_vec","Avg VTAT","Booking Value","Ride Distance","Customer Rating"],"outputCol":"features"},"defaultParamMap":{"handleInvalid":"error","outputCol":"VectorAssembler_d4fb1a76c22c__output"}}
